@@ -1,0 +1,9 @@
+# Robots.txt file for Book Finder app
+
+# See https://www.robotstxt.org/robotstxt.html for more information
+
+# Allow all user agents to access all content
+
+User-agent: *
+
+Disallow:
