@@ -102,6 +102,7 @@ const BookGrid = ({ query = "javascript", theme = "light", filter = "all", onAdd
 
     // Function to fetch books from multiple APIs
     const fetchFromMultipleAPIs = useCallback(async (searchQuery, limit) => {
+        console.log('🔍 Starting API fetch for:', searchQuery, 'limit:', limit);
         const allBooks = [];
 
         // Detect if this looks like a language/culture query
@@ -149,7 +150,9 @@ const BookGrid = ({ query = "javascript", theme = "light", filter = "all", onAdd
                 openLibraryUrl = `https://openlibrary.org/search.json?q=${encodeURIComponent(searchQuery)}&limit=${limit}`;
             }
 
+            console.log('📚 Fetching from Open Library:', openLibraryUrl);
             const openLibraryResponse = await fetch(openLibraryUrl);
+            console.log('📚 Open Library response status:', openLibraryResponse.status);
 
             if (!openLibraryResponse.ok) {
                 throw new Error(`Open Library API error: ${openLibraryResponse.status}`);
@@ -190,6 +193,7 @@ const BookGrid = ({ query = "javascript", theme = "light", filter = "all", onAdd
             }
 
             const googleBooksResponse = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${googleBooksQuery}&maxResults=${limit}&orderBy=relevance`);
+            console.log('📚 Google Books response status:', googleBooksResponse.status);
 
             if (!googleBooksResponse.ok) {
                 throw new Error(`Google Books API error: ${googleBooksResponse.status}`);
@@ -236,6 +240,7 @@ const BookGrid = ({ query = "javascript", theme = "light", filter = "all", onAdd
             )
         );
 
+        console.log('✅ API fetch complete. Found', uniqueBooks.length, 'unique books');
         return uniqueBooks;
     }, []);
 
@@ -251,8 +256,10 @@ const BookGrid = ({ query = "javascript", theme = "light", filter = "all", onAdd
         setError(null);
 
         // Fetch initial books
+        console.log('🚀 Starting initial book fetch for query:', searchQuery);
         fetchFromMultipleAPIs(searchQuery, 40) // Fetch more initially to have buffer
             .then(async (allBooks) => {
+                console.log('📦 Received books from API:', allBooks.length);
                 // Filter books based on user filter
                 const filteredBooksPromises = allBooks.map(async (book) => {
                     // Apply filter
