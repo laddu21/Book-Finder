@@ -37,6 +37,9 @@ function App() {
   const [showThemeDropdown, setShowThemeDropdown] = useState(false);
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
 
+  // State for mobile menu
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   // Mood to genre mapping for AI suggestions
   const moodMap = {
     'happy': 'comedy',
@@ -138,6 +141,7 @@ function App() {
     }
   };
 
+  
   // Function to change theme
   const changeTheme = (newTheme) => {
 
@@ -483,25 +487,31 @@ function App() {
 
           <div className="w-full px-4 md:px-4">
 
-            <div className="flex flex-row justify-between items-center">
+            <div className="flex items-center">
 
-              <div className="flex flex-col md:flex-col">
+              {/* Mobile menu button */}
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="md:hidden p-2 mr-2"
+              >
+                ☰
+              </button>
 
-                <h1 className="text-2xl md:text-3xl font-bold">Book <span className="hidden md:inline">Finder</span></h1>
-
-                <p className="hidden md:block text-sm">Discover your next great read</p>
-
+              {/* Title - hidden on mobile */}
+              <div className="hidden md:flex flex-col mr-4">
+                <h1 className="text-2xl md:text-3xl font-bold">Book Finder</h1>
+                <p className="text-sm">Discover your next great read</p>
               </div>
 
               {/* Search Form */}
-              <form className="flex items-center" onSubmit={(e) => { e.preventDefault(); performSearch(); }}>
+              <form className="flex items-center flex-1 justify-center" onSubmit={(e) => { e.preventDefault(); performSearch(); }}>
                 <input
                   type="text"
                   value={query}
                   onChange={handleQueryChange}
                   onKeyDown={handleKeyPress}
                   placeholder="Search with AI"
-                  className={`w-7/10 md:w-80 px-4 py-2 text-sm border rounded-l-lg focus:outline-none focus:ring-2 ${theme === 'dark'
+                  className={`w-full max-w-xs md:w-80 px-4 py-2 text-sm border rounded-l-lg focus:outline-none focus:ring-2 ${theme === 'dark'
                     ? 'bg-gray-800 border-gray-600 text-white focus:ring-gray-500'
                     : theme === 'reading'
                       ? 'bg-amber-50 border-amber-300 text-gray-900 focus:ring-amber-500'
@@ -516,12 +526,12 @@ function App() {
                 </button>
               </form>
 
-              {/* Right side buttons - Shelf and Theme */}
-              <div className="flex items-center space-x-2">
+              {/* Right side buttons - hidden on mobile */}
+              <div className="hidden md:flex items-center space-x-2 ml-4">
                 {/* My Shelf Button - Desktop */}
                 <button
                   onClick={() => setShowShelf(!showShelf)}
-                  className={`hidden md:flex md:items-center md:space-x-2 px-3 py-2 rounded text-sm ${theme === 'dark' ? 'bg-gray-700 text-white hover:bg-gray-600' : theme === 'reading' ? 'bg-amber-600 text-white hover:bg-amber-700' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+                  className={`flex items-center space-x-2 px-3 py-2 rounded text-sm ${theme === 'dark' ? 'bg-gray-700 text-white hover:bg-gray-600' : theme === 'reading' ? 'bg-amber-600 text-white hover:bg-amber-700' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
                 >
                   <span>📚</span>
                   <span>My Shelf ({myShelf.length})</span>
@@ -536,7 +546,7 @@ function App() {
                     <span>
                       {theme === 'light' ? '☀️' : theme === 'dark' ? '🌙' : '📖'}
                     </span>
-                    <span className="hidden md:inline capitalize">{theme}</span>
+                    <span className="capitalize">{theme}</span>
                     <span>{showThemeDropdown ? '▲' : '▼'}</span>
                   </button>
 
@@ -587,7 +597,7 @@ function App() {
         </header>
 
         {/* Filter Section */}
-        <div className="py-4">
+        <div className="hidden md:block py-4">
           <div className="container mx-auto px-4">
             <div className="flex justify-end items-center">
               {/* My Shelf Button - Mobile */}
@@ -721,6 +731,85 @@ function App() {
           )}
 
         </main>
+
+        {/* Mobile Menu Overlay */}
+        {mobileMenuOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 md:hidden" onClick={() => setMobileMenuOpen(false)}>
+            <div className={`absolute left-0 top-0 h-full w-64 bg-white shadow-lg transition-transform duration-300 ease-in-out ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`} onClick={(e) => e.stopPropagation()}>
+              <div className="p-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-lg font-bold">Book Finder</h2>
+                  <button onClick={() => setMobileMenuOpen(false)} className="text-gray-500">×</button>
+                </div>
+
+                {/* My Shelf Button */}
+                <button
+                  onClick={() => { setShowShelf(!showShelf); setMobileMenuOpen(false); }}
+                  className="w-full text-left px-4 py-2 mb-2 bg-gray-100 rounded flex items-center space-x-2"
+                >
+                  <span>📚</span>
+                  <span>My Shelf ({myShelf.length})</span>
+                </button>
+
+                {/* Theme Selector */}
+                <div className="mb-4">
+                  <h3 className="font-semibold mb-2">Theme</h3>
+                  <div className="space-y-1">
+                    <button
+                      onClick={() => { changeTheme('light'); setMobileMenuOpen(false); }}
+                      className={`w-full text-left px-4 py-2 rounded flex items-center space-x-2 ${theme === 'light' ? 'bg-blue-100' : 'bg-gray-100'}`}
+                    >
+                      <span>☀️</span>
+                      <span>Light</span>
+                    </button>
+                    <button
+                      onClick={() => { changeTheme('dark'); setMobileMenuOpen(false); }}
+                      className={`w-full text-left px-4 py-2 rounded flex items-center space-x-2 ${theme === 'dark' ? 'bg-blue-100' : 'bg-gray-100'}`}
+                    >
+                      <span>🌙</span>
+                      <span>Dark</span>
+                    </button>
+                    <button
+                      onClick={() => { changeTheme('reading'); setMobileMenuOpen(false); }}
+                      className={`w-full text-left px-4 py-2 rounded flex items-center space-x-2 ${theme === 'reading' ? 'bg-blue-100' : 'bg-gray-100'}`}
+                    >
+                      <span>📖</span>
+                      <span>Reading</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Filter Options */}
+                <div>
+                  <h3 className="font-semibold mb-2">Filter</h3>
+                  <div className="space-y-1">
+                    <button
+                      onClick={() => { setBookFilter('all'); setMobileMenuOpen(false); }}
+                      className={`w-full text-left px-4 py-2 rounded flex items-center space-x-2 ${bookFilter === 'all' ? 'bg-blue-100' : 'bg-gray-100'}`}
+                    >
+                      <span>📚</span>
+                      <span>All</span>
+                    </button>
+                    <button
+                      onClick={() => { setBookFilter('free'); setMobileMenuOpen(false); }}
+                      className={`w-full text-left px-4 py-2 rounded flex items-center space-x-2 ${bookFilter === 'free' ? 'bg-blue-100' : 'bg-gray-100'}`}
+                    >
+                      <span>🆓</span>
+                      <span>Free</span>
+                    </button>
+                    <button
+                      onClick={() => { setBookFilter('premium'); setMobileMenuOpen(false); }}
+                      className={`w-full text-left px-4 py-2 rounded flex items-center space-x-2 ${bookFilter === 'premium' ? 'bg-blue-100' : 'bg-gray-100'}`}
+                    >
+                      <span>💎</span>
+                      <span>Premium</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Book Reader Modal */}
         {readingBook && readingBook.archiveId && (
